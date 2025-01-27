@@ -14,5 +14,6 @@ jobs:
           echo $LINE
           TARGET=$(head -n $LINE words.txt | tail -n -1)
           echo $TARGET
+          echo $TITLE
         env:
           EVENT_ID: ${{ github.event.issue.id }}
