@@ -10,15 +10,18 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
-      - name: get the target word
+      - name: computer appropriate responce
+        id: computerResponce
         continue-on-error: true
         run: |
+          set +e
           LINE=$(echo "$EVENT_ID % $(cat words.txt | wc -l) + 1" | bc)
           echo $LINE
           TARGET=$(head -n $LINE words.txt | tail -n -1)
           GUESS=$(echo $TITLE | cut -c 1-5)
           chmod u+x wordle.py
-          ./wordle.py "$TARGET""$GUESS"
+          ./wordle.py "$TARGET""$GUESS" > output.txt
+          echo $?
         env:
           EVENT_ID: ${{ github.event.issue.id }}
           TITLE: ${{ github.event.issue.title }}
