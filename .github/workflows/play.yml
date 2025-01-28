@@ -22,6 +22,7 @@ jobs:
           chmod u+x wordle.py
           ./wordle.py "$TARGET""$GUESS" > output.txt
           echo $?
+          cat output.txt
         env:
           EVENT_ID: ${{ github.event.issue.id }}
           TITLE: ${{ github.event.issue.title }}
