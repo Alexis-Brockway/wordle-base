@@ -2,6 +2,8 @@ name: Play the game
 on:
   issues:
     types: [opened]
+  issue_comment:
+    types: [created]
 jobs:
   playGame:
     runs-on: ubuntu-latest
@@ -10,22 +12,20 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
-      - name: computer appropriate responce
-        id: computerResponce
+      - name: compute appropriate response
+        id: computeResponse
         continue-on-error: true
         run: |
           set +e
           LINE=$(echo "$EVENT_ID % $(cat words.txt | wc -l) + 1" | bc)
-          echo $LINE
           TARGET=$(head -n $LINE words.txt | tail -n -1)
           GUESS=$(echo $TITLE | cut -c 1-5)
           chmod u+x wordle.py
-          ./wordle.py "$TARGET""$GUESS" > output.txt
-          echo "result_code=$?" >> "$GITHUB_STEP_SUMMERY"
-          cat output.txt >> "$GITHUB_STEP_SUMMERY"
+          ./wordle.py "$TARGET" "$GUESS" > output.txt
+          echo "result_code=$?" >> "$GITHUB_OUTPUT"
         env:
           EVENT_ID: ${{ github.event.issue.id }}
-          TITLE: ${{ github.event.issue.title }}
+          TITLE: ${{ github.event.comment.body || github.event.issue.title }}
       - name: Add comment
         run: gh issue comment "$NUMBER" --body-file output.txt
         env:
